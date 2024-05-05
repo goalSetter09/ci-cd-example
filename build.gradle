@@ -23,3 +23,5 @@ dependencies {
 tasks.named('test') {
 	useJUnitPlatform()
 }
+
+jar.enabled = false // github action을 통한 빌드시 plain.jar는 생성하지 않도록 함
