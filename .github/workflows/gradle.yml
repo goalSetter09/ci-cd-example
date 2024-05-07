@@ -45,6 +45,9 @@ jobs:
         run: ssh-keyscan -H ${{ secrets.SERVER_IP }} >> ~/.ssh/known_hosts
       - name: SCP transfer
         run: scp *.jar ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }}:~/cicd
+      - name: Update application.yml
+        run: |
+          ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "echo 'spring:\n  application:\n    name: ci-cd-example\n\n  datasource:\n    driver-class-name: com.mysql.cj.jdbc.Driver\n    url: \${{RDS_ENDPOINT}}\n    username: \${{DB_USERNAME}}\n    password: \${{DB_PASSWORD}}\n\n  jpa:\n    hibernate:\n      ddl-auto: update\n    show-sql: true\n    properties:\n      hibernate:\n        dialect: org.hibernate.dialect.MySQLDialect\n\nlogging:\n  level:\n    org:\n      hibernate:\n        type:\n          descriptor:\n            sql: trace' > ~/cicd/application.yml"
       - name: Execute remote commands
         run: |
           ssh ${{ secrets.SSH_USER }}@${{ secrets.SERVER_IP }} "sudo fuser -k 8080/tcp || true"
